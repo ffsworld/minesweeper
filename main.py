@@ -1,8 +1,8 @@
 from tkinter import *
 import settings
 # import utils
-import game
 from frames import Frames
+from cell import Cell
 
 root = Tk()
 # Override the settings of the window
@@ -22,8 +22,10 @@ root.resizable(False, False)
 
 Frames.getRoot(root)
 Frames.initialize_frames()
-Frames.initialize_gametitle(Frames.top_frame)
-game.start_game(Frames.center_frame, Frames.left_frame)
+Frames.initialize_gametitle(Frames.top_frame, "Minesweeper game")
+# game.start_game(Frames.center_frame, Frames.left_frame)
+Cell.initialize_root(root)
+Cell.start_game(Frames.center_frame, Frames.left_frame)
 
 
 # Run the window: tk should run until we close it

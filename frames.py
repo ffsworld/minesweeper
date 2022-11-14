@@ -10,13 +10,6 @@ class Frames:
     game_title = None
     root = None
 
-    # def __init__(self):
-    #     # Frames.root = root
-    #     # Frames.top_frame = None
-    #     # Frames.left_frame = None
-    #     # Frames.center_frame = None
-    #     # self.initialize_frames()
-
     @staticmethod
     def getRoot(root):
         Frames.root = root
@@ -51,13 +44,17 @@ class Frames:
                                   y=utils.height_prct(25))
 
     @staticmethod
-    def initialize_gametitle(some_frame):
+    def initialize_gametitle(some_frame, title):
 
         Frames.game_title = Label(
             some_frame,  # top_frame
             bg='black',
             fg='white',
-            text='Minesweeper Game',
+            text=title,
             font=('', 48)
         )
         Frames.game_title.place(x=0, y=0)
+
+    @staticmethod
+    def update_gametitle(newTitle):
+        Frames.game_title.config(text = newTitle)

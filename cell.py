@@ -3,12 +3,14 @@ from tkinter import messagebox
 from tkmacosx import Button
 import random
 import settings
+import time
+from frames import Frames
 
 
 class Cell:
-    all = []
-    cell_count = settings.CELL_COUNT
-    cell_count_label_object = None
+    # all = []
+    # cell_count = settings.CELL_COUNT
+    # cell_count_label_object = None
 
     def __init__(self, x, y, is_mine=False):
         self.is_mine = is_mine
@@ -21,6 +23,35 @@ class Cell:
         # Append the object to Cell.all list
         Cell.all.append(self)
 
+    @staticmethod
+    def initialize_cells(frame):
+        for x in range(settings.GRID_SIZE):
+            for y in range(settings.GRID_SIZE):
+                c = Cell(x, y)
+                c.create_btn_object(frame)  # center_frame
+                c.cell_btn_object.grid(
+                    column=x,
+                    row=y
+                )
+        Cell.randomize_mines()
+    @staticmethod
+    def initialize_root(root):
+        Cell.root = root        
+    @staticmethod
+    def initialize_counts(frame):
+        Cell.create_cell_count_label(frame)  # left_frame
+        Cell.cell_count_label_object.place(x=0, y=0)
+
+    @staticmethod
+    def restart_game():
+        Cell.start_game(Frames.center_frame, Frames.left_frame)
+    @staticmethod
+    def start_game(cell_frame, count_label_frame):
+        Cell.initialize_mines()
+        Cell.initialize_cells(cell_frame)
+        Cell.initialize_counts(count_label_frame)
+
+        
     def create_btn_object(self, location):
         btn = Button(
             location,
@@ -51,15 +82,10 @@ class Cell:
             self.show_mine()
         else:
             self.show_current_cell()
-            # if not self.surrounded_cells_mines_length:
-            #     self.show_cell(True)
-            #     for cell_obj in self.surrounded_cells:
-            #         cell_obj.show_cell()
-            # else:
-            #     self.show_cell()
             self.update_cell_count_label()
             if Cell.cell_count == settings.MINES_COUNT:
-                print("YOu won!")
+                print("You won!")
+                self.exit_application(isWin=True)
         # Cancel left and right click events if cell is already opened:
         self.cell_btn_object.unbind('<Button-1>')
         self.cell_btn_object.unbind('<Button-2>')  # TODO
@@ -129,6 +155,14 @@ class Cell:
         self.cell_btn_object.configure(
             bg='red'
         )
+        # Frames.update_gametitle("You Lost!")
+        # time.sleep(10)
+        # Frames.update_gametitle("Restart?")
+        self.exit_application(isWin=False)
+        # Cell.start_game(Frames.center_frame, Frames.left_frame)
+        
+
+
         # if messagebox.askretrycancel('retry', 'Failed! want to try again?') == True:
 
     def right_click_actions(self, event):
@@ -143,6 +177,27 @@ class Cell:
             )
             self.is_mine_candidate = False
 
+    def exit_application(self,isWin):
+        if not isWin:
+            msg_box = messagebox.askquestion('You Lost', 'You Lost 🥲 Would you like to restart?',
+                                                icon='warning')
+        else:
+            msg_box = messagebox.askquestion('You Won', 'You Won 😎 Would you like to restart?')
+        if msg_box == 'yes':
+            Cell.start_game(Frames.center_frame, Frames.left_frame)
+        
+        else:
+            messagebox.showinfo('Return', 'The game window will be closed now.')
+            Cell.root.destroy()
+
+    @staticmethod
+    # a method does not belong to any object instance,
+    # but belongs globally to the class
+    def initialize_mines():
+        Cell.all = []
+        Cell.cell_count = settings.CELL_COUNT
+        Cell.cell_count_label_object = None
+        Frames.game_title.config(text = "Minesweeper Game")
     @staticmethod
     # a method does not belong to any object instance,
     # but belongs globally to the class
@@ -152,6 +207,7 @@ class Cell:
         )
         for picked_cell in picked_cells:
             picked_cell.is_mine = True
+        
 
     def __repr__(self):  # override this method, to print things we want
         return f"Cell({self.x},{self.y})"
